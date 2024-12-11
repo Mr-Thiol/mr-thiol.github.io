@@ -1,6 +1,6 @@
-title: Minimal theme
-logo: main/logo_tempo.jpg
-description: Sam Sheng@FDU Chemisty
+title: Sam Sheng
+logo: /main/logo_tempo.jpg
+description: @FDU Chemisty
 show_downloads: false
 google_analytics:
 theme: jekyll-theme-minimal
