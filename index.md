@@ -1,6 +1,6 @@
 # ***A Title***.
 ## 24.12.11  
-Give birth to my blog website.  
+Gave birth to my blog website.  
 **No template or theme used.** Only texts.<br>
 Creating the website while learning *markdown*.<br>
 > You can’t ever reach perfection, but you can believe in an asymptote toward which you are ceaselessly striving.
