@@ -9,11 +9,9 @@ Creating the website while learning *markdown*.<br>
 ---
 
 ## 24.12.16
-Linear Algebra (LA) alieanated me.<br>
+Linear Algebra (LA) alienated me.<br>
 Tremendous discrepancy.<br>
 Preparing for **Zhou Yi**<br>
 *Tian Feng Gou*<br>
 > Therefore, with the blessing of Heaven, there is nothing unfavorable.
 > > *Zhou Yi*
-
----
