@@ -13,6 +13,6 @@ Linear Algebra (LA) alienated me.<br>
 Tremendous discrepancy.<br>
 Preparing for **Zhou Yi**<br>
 *Tian Feng Gou*<br>
-:smiling_face:
+🥺
 > Therefore, with the blessing of Heaven, there is nothing unfavorable.
 > > *Zhou Yi*
