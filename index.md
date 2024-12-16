@@ -14,4 +14,4 @@ Attempt to add a logo to the website.<br>
 1 Hydrogen atom, 1 R group and 2 Lone Pairs! <br>
 Bring me the proton! Set me free! 🧪
 > Therefore, with the blessing of Heaven, there is nothing unfavorable.
-> > *Zhou Yi*
+> > *I Ching*
