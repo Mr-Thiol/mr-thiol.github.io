@@ -12,6 +12,6 @@ Creating the website while learning *markdown*.<br>
 🥺<br>
 Attempt to add a logo for the website.<br>
 1 Hydrogen atom, 1 R group and 2 Lone Pairs! <br>
-Bring me the proton! 🧪
+Bring me the proton! Set me free! 🧪
 > Therefore, with the blessing of Heaven, there is nothing unfavorable.
 > > *Zhou Yi*
