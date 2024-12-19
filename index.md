@@ -16,3 +16,10 @@ Bring me the proton! Set me free! 🧪<br>
 Recent Loop Song: **Free Bird · Lynyrd Skynyrd**
 > Therefore, with the blessing of Heaven, there is nothing unfavorable.
 > > *I Ching*
+
+---
+
+## 24.12.19
+Attempt to add hyperlink.<br>
+[link to anoter page](./another-page.html) <br>
+Food for Thought: How to define language proficiency?  
