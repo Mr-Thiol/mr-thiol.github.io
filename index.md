@@ -1,4 +1,7 @@
 # ***Tempo(?) Blog***.
+
+[link to anoter page](./another-page.html)
+
 ## 24.12.11  
 Gave birth to my blog website.  
 **No template or theme used.** Only texts.<br>
@@ -20,6 +23,9 @@ Recent Loop Song: **Free Bird · Lynyrd Skynyrd**
 ---
 
 ## 24.12.19
-Attempt to add hyperlink.<br>
-[link to anoter page](./another-page.html) <br>
-Food for Thought: How to define language proficiency?  
+Attempt to add hyperlink.(See top of the page)<br>
+Food for Thought: How to define language proficiency?<br>
+Figure out whether Japanese characters are compatible with *markdown*.<br>
+> もしも限界があるとするならば、それは諦めた瞬間でしょう。
+> > 相棒シーズン１·最終話·杉下右京
+
