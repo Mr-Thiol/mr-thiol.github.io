@@ -1,6 +1,6 @@
 # ***Tempo(?) Blog***.
 
-[link to anoter page](./another-page.html)
+[Link to anoter page](./another-page.html)
 
 ## 24.12.11  
 Gave birth to my blog website.  
