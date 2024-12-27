@@ -8,10 +8,13 @@
 Be back. (Pun🤣) Rearrange the blog in a reverse order. Upload pictures.<br>
 **Mark**👀<br>
 24.12.26<br>
-4.45 pm on the way to the Third Teaching Building to cram for Analytical Chemistry.<br>
+4.45 am on the way to the Third Teaching Building to cram for Analytical Chemistry.<br>
+  <br>
 ![](/assets/img/吗喽.jpg)<br>
+  <br>
 Back.<br>
 ![](/assets/img/龙门楼.jpg)<br>
+  <br>
 Hovering Thoughts: How about keeping more fish? How about crystal shrimps?<br>
 Novel ideas tend to pop up during final weeks......<br>
 
