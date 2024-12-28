@@ -5,23 +5,23 @@
 ---
 
 ## 24.12.27
-Be back. (Pun🤣) Rearrange the blog in a reverse order. Upload pictures.<br>
+Rearranged blog in reverse. Uploaded pictures.<br>
 **Mark**👀<br>
 24.12.26<br>
-4.45 am on the way to the Third Teaching Building to cram for Analytical Chemistry.<br>
   <br>
+4.45 am on the way to the Third Teaching Building to cram for Analytical Chemistry.<br>
 ![](/assets/img/吗喽.jpg)<br>
   <br>
 Back.<br>
 ![](/assets/img/龙门楼.jpg)<br>
   <br>
-Hovering Thoughts: How about keeping more fish? How about crystal shrimps?<br>
-Novel ideas tend to pop up during final weeks......<br>
+Hovering Thoughts: How about getting more fish? How about crystal shrimps?<br>
+Novel ideas pop up during final weeks......<br>
 
 ---
 
 ## 24.12.19
-Attempt to add hyperlink.(See top of the page)<br>
+Hyperlinked. (See top of the page)<br>
 Food for Thought: How to define language proficiency?<br>
 Figure out whether Japanese characters are compatible with *markdown*.<br>
 > もしも限界があるとするならば、それは諦めた瞬間でしょう。
@@ -31,7 +31,7 @@ Figure out whether Japanese characters are compatible with *markdown*.<br>
 
 ## 24.12.16
 🥺<br>
-Attempt to add a logo to the website.<br>
+Added a logo to the website.<br>
 1 Hydrogen atom, 1 R group and 2 Lone Pairs! <br>
 Bring me the proton! Set me free! 🧪<br>
 Recent Loop Song: **Free Bird · Lynyrd Skynyrd**
