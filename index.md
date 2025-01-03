@@ -4,11 +4,25 @@
 
 ---
 
+## 25.01.03
+Updated at Tsinghua University, Beijing. <br>
+Meet friends, chatting. <br>
+![](/assets/img/THU.jpg)<br>
+ <br>
+Waiting for Zeyuan Li in the Third Teaching Building.<br>
+![](/assets/img/THU三教.jpg)<br>
+ <br>
+Tips: <br>
+Taking Line 9 and Airport Link Line from Songjiang District to Pudong International Airport is faster than driving. (About 1h 10mins)<br>
+(🦈 came and saw me off. 🥰)
+
+---
+
 ## 24.12.27
 Rearranged blog in reverse. Uploaded pictures.<br>
+  <br>
 **Mark**👀<br>
 24.12.26<br>
-  <br>
 4.45 am on the way to the Third Teaching Building to cram for Analytical Chemistry.<br>
 ![](/assets/img/吗喽.jpg)<br>
   <br>
