@@ -6,8 +6,9 @@
 
 ## 25.02.17
 2025 Spring Semester begins. <br>
-Learnt to use Psi4. <br>
+Learnt to use *Psi4*. <br>
 Total energy of water molecule calculated. <br>
+![](/assets/img/Psi4_water.png)
 
 ---
 
