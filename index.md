@@ -4,6 +4,12 @@
 
 ---
 
+## 25.9.26
+Always keep this in your mind.<br>
+> 社会で頑張るあなたに。
+
+---
+
 ## 25.08.27
 Finding challenging work is the key to growth, and finding meaningful work is one of many keys to leading a fulfilling life.<br>
 Thank you, **CS106B**! <br>
