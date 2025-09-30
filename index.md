@@ -1,3 +1,8 @@
+---
+layout: default
+title: Home
+---
+
 # ***Tempo(?) Blog***.
 
 [Link to another page](./another-page.html)
