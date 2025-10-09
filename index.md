@@ -6,11 +6,17 @@
 ## 25.10.9
 ### Mark for Trip to Xinjiang 
 Vast. Transparent. Crystal-Clear.<br>
-![](/assets/img/Sailimu.png)<br>
+![](/assets/img/Sailimu.jpg)<br>
 The scenery reminds me of an anime character's words. <br>
->　知ってますか？人の目の高さから見える水平線までの距離は約４キロメートルなんですよ。
->> 牧之原　翔子　Makinohara, Shoko
-</blockquote>
+> 知ってますか？人の目の高さから見える水平線までの距離は約４キロメートルなんですよ。
+>> 牧之原　翔子　Makinohara, Shoko 
+
+<p></p>
+
+(Actually, in Xinjiang, it is far more than 4 kilometers.)<br>
+
+<p></p>
+
 Go **all in** on resting, and go **all in** on striving. <br>
 I love seeing the horizon untouched by human construction. <br>
 The horizon is not an old scar; it is a gap to breathe. <br>
@@ -21,7 +27,9 @@ The horizon is not an old scar; it is a gap to breathe. <br>
 Always keep this in your mind.<br>
 > 社会で頑張るあなたに。<br>
 >
+> 
 >「昨日の私よりも、今日の私がちょっとだけやさしい人間であればいいな」と思いながらいきています。
+>> 牧之原　翔子　Makinohara, Shoko
 
 ---
 
