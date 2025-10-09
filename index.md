@@ -5,8 +5,8 @@
 ---
 ## 25.10.9
 ### Mark for Trip to Xinjiang 
-Vast. Transparent. Crystal-Clear. <br>
-![](/assets/img/Sailimu.png) <br>
+Vast. Transparent. Crystal-Clear.<br>
+![](/assets/img/Sailimu.png)<br>
 The scenery reminds me of an anime character's words. <br>
 >　知ってますか？人の目の高さから見える水平線までの距離は約４キロメートルなんですよ。
 >> 牧之原　翔子　Makinohara, Shoko
