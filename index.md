@@ -3,6 +3,10 @@
 [Link to another page](./another-page.html)
 
 ---
+## 25.10.16
+Strive, contrive and thrive.
+
+---
 ## 25.10.9
 ### Mark for Trip to Xinjiang 
 Vast. Transparent. Crystal-Clear.<br>
