@@ -1,0 +1,25 @@
+# --- Hugo 生成的临时文件 (最重要！) ---
+# 每次编译都会变，不需要上传源码库，GitHub Actions 会自动生成它们
+public/
+resources/_gen/
+hugo_stats.json
+
+# --- 操作系统垃圾文件 ---
+# Windows 生成的缩略图缓存
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Mac 生成的 (如果你以后换 Mac 或者导师用 Mac 看你代码)
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# --- 编辑器配置 (可选) ---
+# 如果你用 VS Code，这些个人配置不需要上传
+.vscode/
+.idea/
+
+# --- 你的私有工具 (关键！) ---
+# 那个用来生成加密代码的 HTML 工具，最好只留在本地，别上传
+KEY_ignore/

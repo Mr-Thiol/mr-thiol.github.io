@@ -1,0 +1,184 @@
+{{- $ciphertext := .Inner -}}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script>
+
+<div class="lock-container" id="lock-{{ .Ordinal }}">
+    <div class="lock-interface">
+        <div class="lock-icon">🔒</div>
+        <p><strong>Private Content</strong></p>
+        
+        <div class="input-group">
+            <input type="password" id="input-{{ .Ordinal }}" placeholder="Password" />
+            <button id="btn-{{ .Ordinal }}">Decrypt</button>
+        </div>
+        <p id="error-{{ .Ordinal }}" class="error-msg">Wrong Password</p>
+    </div>
+    
+    <div class="lock-content" id="content-{{ .Ordinal }}" style="display: none;"></div>
+</div>
+
+<script>
+    (function() {
+        var ordinal = "{{ .Ordinal }}";
+        var encryptedData = "{{ $ciphertext }}".trim(); 
+        
+        var inputId = "input-" + ordinal;
+        var btnId = "btn-" + ordinal;
+        var contentId = "content-" + ordinal;
+        var lockId = "lock-" + ordinal;
+        var errorId = "error-" + ordinal;
+
+        function attemptUnlock() {
+            var inputField = document.getElementById(inputId);
+            var inputPass = inputField.value;
+            var errElem = document.getElementById(errorId);
+
+            if (!inputPass) {
+                inputField.focus();
+                return;
+            }
+
+            try {
+                // 1. AES 解密
+                var bytes = CryptoJS.AES.decrypt(encryptedData, inputPass);
+                var originalText = bytes.toString(CryptoJS.enc.Utf8);
+
+                if (originalText) {
+                    // 2. 【关键修复】使用 marked.parse 将 Markdown 转为 HTML
+                    var htmlContent = marked.parse(originalText);
+                    
+                    var contentArea = document.getElementById(contentId);
+                    contentArea.innerHTML = htmlContent; // 插入真正的 HTML
+                    contentArea.style.display = "block";
+                    
+                    // 隐藏锁界面
+                    document.querySelector('#' + lockId + ' .lock-interface').style.display = 'none';
+                } else {
+                    throw new Error("Wrong password");
+                }
+            } catch (e) {
+                if(errElem) errElem.style.display = 'block';
+                inputField.value = "";
+                inputField.focus();
+            }
+        }
+
+        // 绑定事件
+        var btn = document.getElementById(btnId);
+        if (btn) btn.onclick = attemptUnlock;
+
+        var input = document.getElementById(inputId);
+        if (input) {
+            input.onkeyup = function(event) {
+                if (event.key === "Enter") attemptUnlock();
+            };
+        }
+    })();
+</script>
+
+<style>
+    /* -----------------------------------------------------------
+       CSS 修复：使用 PaperMod 原生变量 (var) 实现完美融合
+       ----------------------------------------------------------- */
+    
+    .lock-container {
+        /* 核心：背景色直接跟随主题卡片颜色 */
+        background-color: var(--entry); 
+        /* 核心：边框跟随主题边框颜色 */
+        border: 1px solid var(--border);
+        /* 核心：文字颜色跟随主题主色 */
+        color: var(--primary);
+        
+        padding: 30px;
+        border-radius: var(--radius); /* 跟随主题圆角 */
+        margin: 25px 0;
+        text-align: center;
+        transition: background-color 0.3s;
+    }
+
+    .lock-icon {
+        font-size: 2.5em;
+        margin-bottom: 15px;
+    }
+    
+    /* 标题颜色 */
+    .lock-interface p strong {
+        color: var(--primary);
+    }
+
+    .input-group {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    /* 输入框样式 */
+    .lock-interface input {
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        outline: none;
+        font-size: 16px;
+        width: 200px;
+        transition: all 0.3s;
+        
+        /* 默认浅色模式下的输入框颜色 */
+        background-color: #f5f5f5;
+        color: #333;
+    }
+    
+    /* 暗黑模式下的输入框特调 */
+    body.dark .lock-interface input {
+        background-color: #121212; /* 纯黑背景，形成凹陷感 */
+        color: #e0e0e0;            /* 亮灰文字 */
+        border-color: #333;
+    }
+
+    .lock-interface input:focus {
+        border-color: var(--primary); /* 聚焦时使用主题色 */
+    }
+
+    /* 按钮样式 */
+    .lock-interface button {
+        padding: 10px 24px;
+        cursor: pointer;
+        /* 背景色使用主题边框色或深色，避免太突兀 */
+        background-color: var(--tertiary); 
+        color: var(--primary);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: opacity 0.2s;
+    }
+
+    .lock-interface button:hover {
+        background-color: var(--primary);
+        color: var(--theme); /* 悬停时反转颜色 */
+    }
+
+    /* 错误提示 */
+    .error-msg {
+        color: #ff4d4f;
+        display: none;
+        font-size: 0.9em;
+        margin-top: 15px;
+    }
+
+    /* 解密后的内容修正 */
+    .lock-content {
+        text-align: left;
+        padding: 10px 5px;
+        line-height: 1.6;
+        margin-top: 10px;
+        /* 确保解密后的文字颜色也跟随主题 */
+        color: var(--content); 
+    }
+    
+    /* 修复解密后的 Markdown 标题太大的问题 */
+    .lock-content h1 { font-size: 1.5em; margin-top: 20px; }
+    .lock-content h2 { font-size: 1.3em; margin-top: 15px; }
+    .lock-content p { margin-bottom: 15px; }
+</style>
