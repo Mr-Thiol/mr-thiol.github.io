@@ -13,8 +13,8 @@ params:
   ShowShareButtons: true
   profileMode:
     enabled: true
-    title: "Hi, I'm Mr.Thiol"
-    subtitle: "AI for Science | Chem 27' | Fudan University"
+    title: "Hi, I'm Hongrui (Sam) Sheng"
+    subtitle: "Junior, Chemistry @ Fudan University"
     imageUrl: "avatar.png" # 以后可以在这里填你的头像图片路径
     buttons:
       - name: Posts
