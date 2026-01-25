@@ -19,7 +19,7 @@ params:
     buttons:
       - name: Posts
         url: /posts/
-      - name: CV (01/2026)
+      - name: CV
         url: /Hongrui_Sheng_FDU_CV.pdf
   assets:
     favicon: "favicon.png"           # 浏览器标签页图标 (16x16, 32x32)
@@ -35,6 +35,10 @@ menu:
       name: Home         # 显示的名字
       url: /             # 斜杠就代表首页
       weight: 5          # 权重越小越靠左，设为 5 保证它在最前面
+    - identifier: about
+      name: About
+      url: /about/
+      weight: 7
     - identifier: posts  # 你之前的 Research/Posts
       name: Posts
       url: /posts/
