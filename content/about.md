@@ -43,7 +43,7 @@ Currently, I am exploring how machine learning methods can be applied to the rat
 
 ### Beyond the Lab
 
-Outside the lab, I share a fulfilling and joyful life with my girlfriend 🦈 (while my representative emoji is 🌵). She is a sophomore majoring in Korean Language and Literature, also at Fudan University 🥰. She loves writing, Korean culture, the Maltese and Golden Retriever puppy (线条小狗), and all things cute! To me, she is a little cat, a bird, a shark, and a Maltese all in one! Feel free to check out her [website](https://natural-block-fe1.notion.site/Karen-s-Portfolio-2ed142d500c38001943fdc2fc7ff25e1).
+Outside the lab, I share a fulfilling and joyful life with my girlfriend 🦈 (while my representative emoji is 🌵). She is a sophomore majoring in Korean Language and Literature, also at Fudan University 🥰. She loves writing, Korean culture, the Maltese and Golden Retriever puppy (线条小狗), and all things cute! To me, she is a little cat, a bird, a shark, and a Maltese all in one! Feel free to check out her [portfolio](https://natural-block-fe1.notion.site/Karen-s-Portfolio-2ed142d500c38001943fdc2fc7ff25e1).
 
 I am planning to add a Gallery section for sharing photos and memories later!💜
 

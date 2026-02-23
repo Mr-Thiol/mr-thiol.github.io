@@ -13,14 +13,14 @@ params:
   ShowShareButtons: true
   profileMode:
     enabled: true
-    title: "Hi, I'm Hongrui (Sam) Sheng"
+    title: "Hi, I'm Hongrui \"Sam\" Sheng"
     subtitle: "Junior, Chemistry @ Fudan University"
     imageUrl: "avatar.png" # 以后可以在这里填你的头像图片路径
     buttons:
       - name: Posts
         url: /posts/
       - name: CV
-        url: /Hongrui_Sheng_FDU_CV.pdf
+        url: /Hongrui_Sheng_Fudan_CV.pdf
   assets:
     favicon: "favicon.png"           # 浏览器标签页图标 (16x16, 32x32)
     favicon16x16: "favicon.png"      # 指定小尺寸也用这张，浏览器会自动缩放
