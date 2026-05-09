@@ -14,7 +14,7 @@ hidemeta: true  # 隐藏发布时间、字数统计等（PaperMod特性）
 
 ## Get in Touch
 
-I am currently open to **extended summer research opportunities (Summer 2026)** and **PhD opportunities (Fall 2027)**!
+I am currently open to **PhD opportunities (Fall 2027)**!
 
 ### 📧 Email
 The best way to reach me is via email:
