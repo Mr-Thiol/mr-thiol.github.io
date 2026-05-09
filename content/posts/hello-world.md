@@ -1,7 +1,7 @@
 ---
 title: "My First Post with Math"
 date: 2026-01-13T20:00:00+08:00
-draft: false  # 【关键】把 true 改成 false，否则默认不显示
+draft: true  # 【关键】把 true 改成 false，否则默认不显示
 tags: ["Chemistry", "Hugo", "AI for Science"]  # <--- 加上这一行！注意格式
 categories: ["Research"] # 顺便也可以加上分类
 ---
