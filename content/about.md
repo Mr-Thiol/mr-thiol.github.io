@@ -19,6 +19,7 @@ Currently, I am exploring how machine learning methods can be applied to the rat
 ### Research Interests
 
 * **AI for Chemistry:** Applying machine learning methods and Large Language Models to chemical systems.
+* **Autonomous Labs (Smart Labs):** Accelerating Scientific Iteration Beyond AI-Driven Modeling
 * **Catalyst Design:** Electrocatalysis, specifically for biomass valorization.
 * **Computational Chemistry:** Density Functional Theory (DFT) & Quantum Chemistry.
 
@@ -27,6 +28,11 @@ Currently, I am exploring how machine learning methods can be applied to the rat
 * **Fudan University** | *B.S. in Chemistry* (Expected 2027)
 * **"AI + Wangdao" Program** | *Research Program Leader* 
 * **Fudan Integrative Medicine Association** | *Founding President*
+
+### Research Experience
+
+* **Fudan University** | <a href="https://electrocat.fudan.edu.cn/" target="_blank">Professor Ming Gong's Group</a> | AI + Electrocatalysis
+* **Washington University in St. Louis** | <a href="https://zhenglab.wustl.edu/" target="_blank">Professor Zhiling (Zach) Zheng's Group</a> | AI + Reticular Chemistry
 
 ### Technical Skills
 
