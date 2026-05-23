@@ -218,11 +218,11 @@
       background: rgba(0,0,0,0.72); z-index: 9999;
       display: flex; align-items: center; justify-content: center;
     }
-    .modal-box { position: relative; width: 84vw; height: 74vh; background: var(--card); border-radius: 16px; overflow: hidden; }
+    .modal-box { position: relative; width: 100vw; height: 100vh; background: var(--card); border-radius: 0; overflow: hidden; }
     .modal-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
     .modal-close { position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(0,0,0,0.5); border: none; border-radius: 8px; color: white; cursor: pointer; padding: 6px 12px; font-size: 16px; }
     /* 2D canvas inside result cards */
-    .c2d-canvas { width: 100%; height: 110px; display: block; border-bottom: 1px solid var(--line); background: var(--input-bg); }
+    .c2d-canvas { width: 100%; height: 180px; display: block; border-bottom: 1px solid var(--line); background: var(--input-bg); }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
@@ -234,6 +234,25 @@
   </section>
 
   <section class="panel">
+    <!-- 化合物名称查询行 -->
+    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:flex-end">
+      <div style="flex:1">
+        <label>Compound Name (auto → SMILES)</label>
+        <input v-model="compoundName" @keyup.enter="lookupName" placeholder="e.g. aspirin, caffeine, metoclopramide, ibuprofen…" />
+      </div>
+      <div>
+        <button @click="lookupName" :disabled="!compoundName.trim() || loading">→ SMILES</button>
+      </div>
+    </div>
+    <!-- 示例分子 -->
+    <div style="margin-bottom:10px;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:5px;align-items:center">
+      <span style="margin-right:2px">Try:</span>
+      <span v-for="ex in examples" :key="ex.name"
+            @click="smiles=ex.smiles;draw2D(ex.smiles)"
+            style="cursor:pointer;color:var(--brand-b);padding:2px 9px;border:1px solid var(--brand-b);border-radius:999px;font-size:11px;white-space:nowrap">
+        {{ ex.name }}
+      </span>
+    </div>
     <div class="grid">
       <div>
         <label>SMILES</label>
@@ -346,8 +365,18 @@ createApp({
   data() {
     return {
       smiles: 'CCN(CC)CCNC(=O)C1=CC(=C(C=C1OC)N)Cl',
+      compoundName: '',
       nBeams: 5,
       apiBase: (window.RETRO_CONFIG && window.RETRO_CONFIG.apiBase) || '',
+      examples: [
+        { name: 'Metoclopramide', smiles: 'CCN(CC)CCNC(=O)C1=CC(=C(C=C1OC)N)Cl' },
+        { name: 'Aspirin',        smiles: 'CC(=O)Oc1ccccc1C(=O)O' },
+        { name: 'Ibuprofen',      smiles: 'CC(C)Cc1ccc(cc1)C(C)C(=O)O' },
+        { name: 'Caffeine',       smiles: 'Cn1c(=O)c2c(ncn2C)n(C)c1=O' },
+        { name: 'Paracetamol',    smiles: 'CC(=O)Nc1ccc(O)cc1' },
+        { name: 'Penicillin G',   smiles: 'CC1(C)SC2C(NC(=O)Cc3ccccc3)C(=O)N2C1C(=O)O' },
+        { name: 'Morphine',       smiles: 'OC1=CC2=C(C=C1)C1CC(=C[C@@H]3CC=C[C@H]1[N@@]23)O' },
+      ],
       loading: false,
       loadingMsg: 'Connecting…',
       loadingSec: 0,
@@ -426,7 +455,7 @@ createApp({
       const lightTheme = { C: '#1f2937', O: '#dc2626', N: '#1d4ed8', H: '#6b7280', S: '#d97706', F: '#059669', Cl: '#16a34a', Br: '#c2410c', I: '#7c3aed', P: '#ea580c', background: '#ffffff' };
       const darkTheme  = { C: '#e2e8f0', O: '#f87171', N: '#60a5fa', H: '#94a3b8', S: '#fbbf24', F: '#34d399', Cl: '#4ade80', Br: '#fb923c', I: '#a78bfa', P: '#f97316', background: '#1a1f2e' };
       const drawer = new SmilesDrawer.Drawer({
-        width: w, height: 110, compactDrawing: false, bondThickness: 1.0,
+        width: w, height: 180, compactDrawing: false, bondThickness: 1.0,
         themes: { custom: IS_DARK ? darkTheme : lightTheme }
       });
       SmilesDrawer.parse(smiles, tree => {
@@ -453,6 +482,20 @@ createApp({
     closeModal() {
       if (this.modal3d.viewer) { try { this.modal3d.viewer.clear(); } catch(e) {} this.modal3d.viewer = null; }
       this.modal3d.show = false;
+    },
+    async lookupName() {
+      const name = (this.compoundName || '').trim();
+      if (!name) return;
+      this.error = '';
+      try {
+        const url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(name)}/property/CanonicalSMILES/JSON`;
+        const resp = await axios.get(url, { timeout: 10000 });
+        const smi = resp.data.PropertyTable.Properties[0].CanonicalSMILES;
+        this.smiles = smi;
+        this.draw2D(smi);
+      } catch(e) {
+        this.error = `"${name}" not found in PubChem. Try another spelling or enter SMILES directly.`;
+      }
     },
     async run() {
       this.loading = true;
@@ -487,8 +530,8 @@ createApp({
           optimize_confs: 30
         }, cfg);
 
-        this.rows = p2.data.retrosynthesis.rows || [];
-        this.cards = p2.data.molecule_cards || [];
+        this.rows = (p2.data.retrosynthesis.rows || []).slice(0, this.nBeams);
+        this.cards = (p2.data.molecule_cards || []).slice(0, this.nBeams);
 
         await nextTick();
         this.cardViewers.forEach(v => { try { v.clear(); } catch (e) {} });
