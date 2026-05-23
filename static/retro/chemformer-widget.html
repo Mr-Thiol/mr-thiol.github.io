@@ -16,19 +16,40 @@
       --muted: #6b7280;
       --line: #d1d5db;
       --card: #ffffff;
+      --card2: #f8fafc;
       --brand-a: #155e75;
       --brand-b: #1d4ed8;
       --ok: #15803d;
       --warn: #a16207;
       --bad: #b91c1c;
+      --input-bg: #ffffff;
+      --hint-bg: #f8fafc;
+      --hint-color: #334155;
+      --3d-bg: white;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1117;
+        --ink: #e2e8f0;
+        --muted: #94a3b8;
+        --line: #334155;
+        --card: #1e293b;
+        --card2: #0f172a;
+        --brand-a: #0e7490;
+        --brand-b: #2563eb;
+        --ok: #16a34a;
+        --warn: #ca8a04;
+        --bad: #dc2626;
+        --input-bg: #1e293b;
+        --hint-bg: #0f172a;
+        --hint-color: #94a3b8;
+        --3d-bg: #1a1f2e;
+      }
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background:
-        radial-gradient(circle at 12% 8%, #dcf3f9, transparent 40%),
-        radial-gradient(circle at 88% 5%, #dbe8ff, transparent 44%),
-        var(--bg);
+      background: var(--bg);
       color: var(--ink);
       font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
     }
@@ -53,12 +74,13 @@
     }
     .grid {
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr auto;
+      grid-template-columns: 3fr 1fr auto auto;
       gap: 10px;
       align-items: end;
     }
     @media (max-width: 980px) {
-      .grid { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: 1fr 1fr; }
+      .grid > :first-child { grid-column: 1 / -1; }
     }
 
     label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
@@ -68,8 +90,10 @@
       border-radius: 10px;
       padding: 10px 12px;
       font-size: 14px;
-      background: #fff;
+      background: var(--input-bg);
+      color: var(--ink);
     }
+    input::placeholder { color: var(--muted); }
     button {
       border: 0;
       border-radius: 10px;
@@ -77,8 +101,15 @@
       font-weight: 700;
       cursor: pointer;
       color: #fff;
+      white-space: nowrap;
       background: linear-gradient(135deg, var(--brand-a), var(--brand-b));
     }
+    button.clear-btn {
+      background: var(--card2);
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+    button.clear-btn:hover:not([disabled]) { background: var(--line); }
     button[disabled] { opacity: 0.55; cursor: not-allowed; }
 
     .badge {
@@ -96,13 +127,13 @@
 
     .hint {
       margin-top: 8px;
-      border: 1px solid #e2e8f0;
+      border: 1px solid var(--line);
       border-radius: 10px;
-      background: #f8fafc;
+      background: var(--hint-bg);
       padding: 8px 10px;
       font-size: 13px;
       line-height: 1.6;
-      color: #334155;
+      color: var(--hint-color);
     }
 
     .preview-grid {
@@ -119,11 +150,25 @@
       border-radius: 10px;
       padding: 8px;
       min-height: 320px;
-      background: #fff;
+      background: var(--card);
     }
-    .box h4 { margin: 0 0 6px; color: #64748b; font-size: 13px; font-weight: 600; }
-    #preview2d { width: 100%; height: 280px; border: 1px dashed #dbe2ea; border-radius: 8px; }
-    #preview3d { width: 100%; height: 280px; border: 1px dashed #dbe2ea; border-radius: 8px; }
+    .box h4 { margin: 0 0 6px; color: var(--muted); font-size: 13px; font-weight: 600; }
+    #preview2d { width: 100%; height: 280px; border: 1px dashed var(--line); border-radius: 8px; display: block; }
+
+    /* 3D viewer 容器：position:relative + 明确尺寸，防止 3Dmol 渲染堆到左上角 */
+    .viewer3d-wrap, .mol3d-wrap {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+    .viewer3d-wrap { height: 280px; border: 1px dashed var(--line); }
+    .mol3d-wrap { height: 190px; border-bottom: 1px solid var(--line); border-radius: 0; }
+    .viewer3d-wrap > div, .mol3d-wrap > div {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+    }
 
     .result-grid {
       margin-top: 10px;
@@ -135,19 +180,18 @@
       .result-grid { grid-template-columns: 1fr; }
     }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th, td { border-bottom: 1px solid #e5e7eb; padding: 7px 6px; text-align: left; vertical-align: top; }
-    th { color: #475569; font-size: 12px; }
-    .mono { font-family: Consolas, "Courier New", monospace; font-size: 12px; }
+    th, td { border-bottom: 1px solid var(--line); padding: 7px 6px; text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-size: 12px; }
+    .mono { font-family: Consolas, "Courier New", monospace; font-size: 12px; word-break: break-all; }
 
     .cards {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 10px;
     }
-    .card { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; background: #fff; }
-    .card h5 { margin: 0; padding: 8px 10px; background: #f8fafc; border-bottom: 1px solid #edf2f7; font-size: 13px; }
-    .mol3d { width: 100%; height: 190px; border-bottom: 1px solid #edf2f7; }
-    .meta { padding: 8px 10px; font-size: 12px; color: #334155; line-height: 1.55; }
+    .card { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--card); }
+    .card h5 { margin: 0; padding: 8px 10px; background: var(--card2); border-bottom: 1px solid var(--line); font-size: 13px; color: var(--ink); }
+    .meta { padding: 8px 10px; font-size: 12px; color: var(--hint-color); line-height: 1.55; }
 
     .err {
       margin-top: 10px;
@@ -158,6 +202,10 @@
       padding: 8px 10px;
       font-size: 13px;
     }
+    @media (prefers-color-scheme: dark) {
+      .err { background: #3f0a10; border-color: #7f1d1d; color: #fca5a5; }
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -171,7 +219,7 @@
     <div class="grid">
       <div>
         <label>SMILES</label>
-        <input v-model="smiles" placeholder="Input SMILES" />
+        <input v-model="smiles" placeholder="e.g. CCN(CC)CCNC(=O)C1=CC(=C(C=C1OC)N)Cl" />
       </div>
       <div>
         <label>Beam Size</label>
@@ -180,12 +228,17 @@
         </select>
       </div>
       <div>
-        <label>API Base</label>
-        <input v-model="apiBase" placeholder="https://your-space-name.hf.space" />
+        <button @click="run" :disabled="loading">{{ loading ? loadingMsg : 'Predict' }}</button>
       </div>
       <div>
-        <button @click="run" :disabled="loading">{{ loading ? 'Running...' : 'Preview + Predict' }}</button>
+        <button class="clear-btn" @click="clearAll" :disabled="loading">Clear</button>
       </div>
+    </div>
+
+    <div v-if="loading" style="margin-top:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--hint-bg);font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px">
+      <span style="display:inline-block;width:14px;height:14px;flex-shrink:0;border:2px solid var(--line);border-top-color:var(--brand-b);border-radius:50%;animation:spin .8s linear infinite"></span>
+      {{ loadingMsg }}
+      <span v-if="loadingSec >= 3" style="margin-left:auto;font-size:11px;opacity:.7">{{ loadingSec }}s</span>
     </div>
 
     <div v-if="estimate" style="margin-top:10px;">
@@ -203,7 +256,9 @@
       </div>
       <div class="box">
         <h4>3D Preview</h4>
-        <div id="preview3d"></div>
+        <div class="viewer3d-wrap">
+          <div id="preview3d"></div>
+        </div>
       </div>
     </div>
 
@@ -237,7 +292,9 @@
         <div class="cards">
           <div class="card" v-for="(c, i) in cards" :key="i">
             <h5>{{ c.name }}</h5>
-            <div class="mol3d" :id="'mol3d-'+i"></div>
+            <div class="mol3d-wrap">
+              <div :id="'mol3d-'+i"></div>
+            </div>
             <div class="meta">
               <div class="mono">{{ c.smiles }}</div>
               <div>MW {{ c.descriptors.mw }} | logP {{ c.descriptors.logp }}</div>
@@ -254,13 +311,18 @@
 <script>
 const { createApp, nextTick } = Vue;
 
+const IS_DARK = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
 createApp({
   data() {
     return {
       smiles: 'CCN(CC)CCNC(=O)C1=CC(=C(C=C1OC)N)Cl',
       nBeams: 5,
-      apiBase: (window.RETRO_CONFIG && window.RETRO_CONFIG.apiBase) || 'https://your-space-name.hf.space',
+      apiBase: (window.RETRO_CONFIG && window.RETRO_CONFIG.apiBase) || '',
       loading: false,
+      loadingMsg: 'Connecting…',
+      loadingSec: 0,
+      _loadingTimer: null,
       error: '',
       estimate: null,
       rows: [],
@@ -271,54 +333,92 @@ createApp({
   },
   methods: {
     draw2D(smiles) {
+      const canvas = document.getElementById('preview2d');
+      if (!canvas) return;
+      const w = canvas.parentElement.clientWidth - 20 || 500;
+      const lightTheme = { C: '#1f2937', O: '#dc2626', N: '#1d4ed8', H: '#6b7280', S: '#d97706', F: '#059669', Cl: '#16a34a', Br: '#c2410c', I: '#7c3aed', P: '#ea580c', background: '#ffffff' };
+      const darkTheme  = { C: '#e2e8f0', O: '#f87171', N: '#60a5fa', H: '#94a3b8', S: '#fbbf24', F: '#34d399', Cl: '#4ade80', Br: '#fb923c', I: '#a78bfa', P: '#f97316', background: '#1a1f2e' };
       const drawer = new SmilesDrawer.Drawer({
-        width: document.getElementById('preview2d').clientWidth || 500,
-        height: 280,
+        width: w, height: 280,
         compactDrawing: false,
-        bondThickness: 1.2
+        bondThickness: 1.2,
+        themes: { custom: IS_DARK ? darkTheme : lightTheme }
       });
       SmilesDrawer.parse(smiles, tree => {
-        drawer.draw(tree, 'preview2d', 'light', false);
-      }, err => {
-        console.error(err);
-      });
+        drawer.draw(tree, 'preview2d', 'custom', false);
+      }, err => console.error(err));
     },
     draw3D(elId, molblock) {
       const el = document.getElementById(elId);
       if (!el) return null;
-      const v = $3Dmol.createViewer(el, { backgroundColor: 'white' });
+      const bgColor = IS_DARK ? '#1a1f2e' : 'white';
+      const v = $3Dmol.createViewer(el, { backgroundColor: bgColor });
       if (molblock) {
         v.addModel(molblock, 'mol');
         v.setStyle({}, { stick: { radius: 0.14 }, sphere: { scale: 0.28 } });
         v.zoomTo();
         v.render();
+        // 等布局稳定后强制 resize，防止 3Dmol 取到 0 宽高而堆在左上角
+        requestAnimationFrame(() => { try { v.resize(); v.render(); } catch(e){} });
       }
       return v;
     },
     normalizeBase(base) {
       return String(base || '').replace(/\/$/, '');
     },
+    clearAll() {
+      this.estimate = null;
+      this.rows = [];
+      this.cards = [];
+      this.error = '';
+      this.smiles = '';
+      nextTick(() => {
+        // 清 2D canvas
+        const canvas = document.getElementById('preview2d');
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        // 清 3D 预览
+        if (this.previewViewer) {
+          try { this.previewViewer.clear(); this.previewViewer.render(); } catch(e) {}
+          this.previewViewer = null;
+        }
+        this.cardViewers.forEach(v => { try { v.clear(); v.render(); } catch(e) {} });
+        this.cardViewers = [];
+      });
+    },
     async run() {
       this.loading = true;
+      this.loadingMsg = 'Connecting…';
+      this.loadingSec = 0;
       this.error = '';
       this.rows = [];
       this.cards = [];
+      this._loadingTimer = setInterval(() => { this.loadingSec++; }, 1000);
       try {
         const base = this.normalizeBase(this.apiBase);
-        const p1 = await axios.post(base + '/preview', { smiles: this.smiles });
+        // 180s 超时：覆盖冷启动（模型加载约 60-120s）+ 推理时间
+        const cfg = { timeout: 180000 };
+
+        this.loadingMsg = 'Loading model… (cold start may take ~60 s)';
+        const p1 = await axios.post(base + '/preview', { smiles: this.smiles }, cfg);
         this.estimate = p1.data.success_estimate;
         this.draw2D(p1.data.canonical_smiles || this.smiles);
 
         if (this.previewViewer) {
           try { this.previewViewer.clear(); } catch (e) {}
+          this.previewViewer = null;
         }
+        await nextTick();
         this.previewViewer = this.draw3D('preview3d', p1.data.preview_3d_molblock);
 
+        this.loadingMsg = 'Running beam search…';
         const p2 = await axios.post(base + '/retrosynthesis', {
           smiles: this.smiles,
           n_beams: this.nBeams,
           optimize_confs: 30
-        });
+        }, cfg);
 
         this.rows = p2.data.retrosynthesis.rows || [];
         this.cards = p2.data.molecule_cards || [];
@@ -326,13 +426,20 @@ createApp({
         await nextTick();
         this.cardViewers.forEach(v => { try { v.clear(); } catch (e) {} });
         this.cardViewers = [];
+        // 给 DOM 100ms 完成布局后再初始化 3D viewer，避免取到 0 尺寸
+        await new Promise(r => setTimeout(r, 100));
         this.cards.forEach((c, i) => {
           const v = this.draw3D('mol3d-' + i, c.molblock_3d);
           if (v) this.cardViewers.push(v);
         });
       } catch (e) {
-        this.error = 'Request failed: ' + (e?.response?.data?.detail || e.message || 'Unknown error');
+        const isTimeout = e.code === 'ECONNABORTED' || (e.message || '').includes('timeout');
+        this.error = isTimeout
+          ? 'The service is waking up (cold start). Please wait ~30 seconds and try again.'
+          : 'Request failed: ' + (e?.response?.data?.detail || e.message || 'Unknown error');
       } finally {
+        clearInterval(this._loadingTimer);
+        this._loadingTimer = null;
         this.loading = false;
       }
     }
