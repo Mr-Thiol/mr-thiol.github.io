@@ -1,9 +1,21 @@
-<div style="width:100%;min-height:1020px;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;box-shadow:0 8px 22px rgba(0,0,0,0.08)">
+<div id="retro-wrap" style="width:100%;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;box-shadow:0 8px 22px rgba(0,0,0,0.08)">
   <iframe
+    id="retro-iframe"
     src="{{ .Get `src` | default `/retro/chemformer-widget.html` }}"
     title="Chemformer Retrosynthesis Widget"
-    style="width:100%;height:1020px;border:none"
+    style="width:100%;height:1060px;border:none;display:block"
     loading="lazy"
     referrerpolicy="no-referrer"
+    scrolling="no"
   ></iframe>
 </div>
+<script>
+(function(){
+  var frame = document.getElementById('retro-iframe');
+  window.addEventListener('message', function(e) {
+    if (e.data && e.data.type === 'retro-resize' && typeof e.data.height === 'number') {
+      frame.style.height = (e.data.height + 8) + 'px';
+    }
+  });
+})();
+</script>

@@ -205,6 +205,24 @@
     @media (prefers-color-scheme: dark) {
       .err { background: #3f0a10; border-color: #7f1d1d; color: #fca5a5; }
     }
+    /* Zoom button on 3D viewers */
+    .viewer-zoom-btn {
+      position: absolute; top: 6px; right: 6px; z-index: 10;
+      background: rgba(0,0,0,0.45); border: none; border-radius: 6px;
+      color: white; cursor: pointer; padding: 4px 7px; font-size: 14px; line-height: 1;
+    }
+    .viewer-zoom-btn:hover { background: rgba(0,0,0,0.72); }
+    /* Modal */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.72); z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal-box { position: relative; width: 84vw; height: 74vh; background: var(--card); border-radius: 16px; overflow: hidden; }
+    .modal-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    .modal-close { position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(0,0,0,0.5); border: none; border-radius: 8px; color: white; cursor: pointer; padding: 6px 12px; font-size: 16px; }
+    /* 2D canvas inside result cards */
+    .c2d-canvas { width: 100%; height: 110px; display: block; border-bottom: 1px solid var(--line); background: var(--input-bg); }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
@@ -224,7 +242,7 @@
       <div>
         <label>Beam Size</label>
         <select v-model.number="nBeams">
-          <option v-for="n in [3,5,8,10,12]" :key="n" :value="n">{{n}}</option>
+          <option v-for="n in [3,5,8,10,12,15,20]" :key="n" :value="n">{{n}}</option>
         </select>
       </div>
       <div>
@@ -258,6 +276,7 @@
         <h4>3D Preview</h4>
         <div class="viewer3d-wrap">
           <div id="preview3d"></div>
+          <button class="viewer-zoom-btn" @click="openZoom(previewMolblock)" title="Zoom">⛶</button>
         </div>
       </div>
     </div>
@@ -292,8 +311,10 @@
         <div class="cards">
           <div class="card" v-for="(c, i) in cards" :key="i">
             <h5>{{ c.name }}</h5>
+            <canvas class="c2d-canvas" :id="'c2d-'+i"></canvas>
             <div class="mol3d-wrap">
               <div :id="'mol3d-'+i"></div>
+              <button class="viewer-zoom-btn" @click="openZoom(c.molblock_3d)" title="Zoom">⛶</button>
             </div>
             <div class="meta">
               <div class="mono">{{ c.smiles }}</div>
@@ -306,6 +327,14 @@
       </div>
     </div>
   </section>
+
+  <!-- Modal: 放大 3D 视图 -->
+  <div v-if="modal3d.show" class="modal-overlay" @click.self="closeModal">
+    <div class="modal-box">
+      <div id="modal-3d-viewer" class="modal-3d"></div>
+      <button class="modal-close" @click="closeModal">✕</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -328,6 +357,8 @@ createApp({
       rows: [],
       cards: [],
       previewViewer: null,
+      previewMolblock: null,
+      modal3d: { show: false, molblock: null, viewer: null },
       cardViewers: []
     };
   },
@@ -388,6 +419,41 @@ createApp({
         this.cardViewers = [];
       });
     },
+    draw2DCard(canvasId, smiles) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const w = canvas.parentElement.clientWidth - 4 || 240;
+      const lightTheme = { C: '#1f2937', O: '#dc2626', N: '#1d4ed8', H: '#6b7280', S: '#d97706', F: '#059669', Cl: '#16a34a', Br: '#c2410c', I: '#7c3aed', P: '#ea580c', background: '#ffffff' };
+      const darkTheme  = { C: '#e2e8f0', O: '#f87171', N: '#60a5fa', H: '#94a3b8', S: '#fbbf24', F: '#34d399', Cl: '#4ade80', Br: '#fb923c', I: '#a78bfa', P: '#f97316', background: '#1a1f2e' };
+      const drawer = new SmilesDrawer.Drawer({
+        width: w, height: 110, compactDrawing: false, bondThickness: 1.0,
+        themes: { custom: IS_DARK ? darkTheme : lightTheme }
+      });
+      SmilesDrawer.parse(smiles, tree => {
+        drawer.draw(tree, canvasId, 'custom', false);
+      }, err => console.warn('2D draw err:', err));
+    },
+    openZoom(molblock) {
+      if (!molblock) return;
+      this.modal3d.molblock = molblock;
+      this.modal3d.show = true;
+      nextTick(() => {
+        const el = document.getElementById('modal-3d-viewer');
+        if (!el) return;
+        if (this.modal3d.viewer) { try { this.modal3d.viewer.clear(); } catch(e) {} }
+        const bgColor = IS_DARK ? '#1a1f2e' : 'white';
+        const v = $3Dmol.createViewer(el, { backgroundColor: bgColor });
+        v.addModel(molblock, 'mol');
+        v.setStyle({}, { stick: { radius: 0.18 }, sphere: { scale: 0.32 } });
+        v.zoomTo(); v.render();
+        requestAnimationFrame(() => { try { v.resize(); v.render(); } catch(e){} });
+        this.modal3d.viewer = v;
+      });
+    },
+    closeModal() {
+      if (this.modal3d.viewer) { try { this.modal3d.viewer.clear(); } catch(e) {} this.modal3d.viewer = null; }
+      this.modal3d.show = false;
+    },
     async run() {
       this.loading = true;
       this.loadingMsg = 'Connecting…';
@@ -404,6 +470,7 @@ createApp({
         this.loadingMsg = 'Loading model… (cold start may take ~60 s)';
         const p1 = await axios.post(base + '/preview', { smiles: this.smiles }, cfg);
         this.estimate = p1.data.success_estimate;
+        this.previewMolblock = p1.data.preview_3d_molblock || null;
         this.draw2D(p1.data.canonical_smiles || this.smiles);
 
         if (this.previewViewer) {
@@ -431,6 +498,7 @@ createApp({
         this.cards.forEach((c, i) => {
           const v = this.draw3D('mol3d-' + i, c.molblock_3d);
           if (v) this.cardViewers.push(v);
+          if (c.smiles) this.draw2DCard('c2d-' + i, c.smiles);
         });
       } catch (e) {
         const isTimeout = e.code === 'ECONNABORTED' || (e.message || '').includes('timeout');
@@ -446,6 +514,12 @@ createApp({
   },
   mounted() {
     this.draw2D(this.smiles);
+    // 动态上报内容高度，让父页面 iframe 自动伸缩（消除右侧滚动条）
+    const ro = new ResizeObserver(() => {
+      window.parent.postMessage({ type: 'retro-resize', height: document.documentElement.scrollHeight }, '*');
+    });
+    ro.observe(document.body);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') this.closeModal(); });
   }
 }).mount('#app');
 </script>
