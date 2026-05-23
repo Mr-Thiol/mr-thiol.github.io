@@ -229,6 +229,7 @@
 </head>
 <body>
 <div id="app" class="wrap">
+<div id="dark-probe" style="display:none;background:var(--page-bg)"></div>
   <section class="hero">
     <h2>Chemformer Retrosynthesis</h2>
     <p>SMILES input -> 2D/3D preview -> success estimate -> one-step retrosynthesis beams.</p>
@@ -375,7 +376,17 @@
 <script>
 const { createApp, nextTick } = Vue;
 
-const IS_DARK = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+// 动态检测暗色模式（通过 CSS 变量探针，比 media query 在 iframe 中更可靠）
+function isDark() {
+  try {
+    const p = document.getElementById('dark-probe');
+    if (p) {
+      const m = getComputedStyle(p).backgroundColor.match(/\d+/g);
+      if (m) return (0.299 * +m[0] + 0.587 * +m[1] + 0.114 * +m[2]) / 255 < 0.5;
+    }
+  } catch (e) {}
+  return window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;
+}
 
 createApp({
   data() {
@@ -433,9 +444,8 @@ createApp({
       const drawer = new SmilesDrawer.Drawer({
         width: w, height: 280,
         compactDrawing: false,
-        terminalCarbons: true,
         bondThickness: 1.2,
-        themes: { custom: IS_DARK ? darkTheme : lightTheme }
+        themes: { custom: isDark() ? darkTheme : lightTheme }
       });
       SmilesDrawer.parse(smiles, tree => {
         drawer.draw(tree, 'preview2d', 'custom', false);
@@ -444,7 +454,7 @@ createApp({
     draw3D(elId, molblock) {
       const el = document.getElementById(elId);
       if (!el) return null;
-      const bgColor = IS_DARK ? '#1a1f2e' : 'white';
+      const bgColor = isDark() ? '#1a1f2e' : 'white';
       const v = $3Dmol.createViewer(el, { backgroundColor: bgColor });
       if (molblock) {
         v.addModel(molblock, 'mol');
@@ -490,8 +500,8 @@ createApp({
       const lightTheme = { C: '#1f2937', O: '#dc2626', N: '#1d4ed8', H: '#6b7280', S: '#d97706', F: '#059669', Cl: '#16a34a', Br: '#c2410c', I: '#7c3aed', P: '#ea580c', background: '#ffffff' };
       const darkTheme  = { C: '#e2e8f0', O: '#f87171', N: '#60a5fa', H: '#94a3b8', S: '#fbbf24', F: '#34d399', Cl: '#4ade80', Br: '#fb923c', I: '#a78bfa', P: '#f97316', background: '#1a1f2e' };
       const drawer = new SmilesDrawer.Drawer({
-        width: w, height: 180, compactDrawing: false, terminalCarbons: true, bondThickness: 1.0,
-        themes: { custom: IS_DARK ? darkTheme : lightTheme }
+        width: w, height: 180, compactDrawing: false, bondThickness: 1.0,
+        themes: { custom: isDark() ? darkTheme : lightTheme }
       });
       SmilesDrawer.parse(smiles, tree => {
         drawer.draw(tree, canvasId, 'custom', false);
@@ -505,7 +515,7 @@ createApp({
         const el = document.getElementById('modal-3d-viewer');
         if (!el) return;
         if (this.modal3d.viewer) { try { this.modal3d.viewer.clear(); } catch(e) {} }
-        const bgColor = IS_DARK ? '#1a1f2e' : 'white';
+        const bgColor = isDark() ? '#1a1f2e' : 'white';
         const v = $3Dmol.createViewer(el, { backgroundColor: bgColor });
         v.addModel(molblock, 'mol');
         v.setStyle({}, { stick: { radius: 0.18 }, sphere: { scale: 0.32 } });
@@ -524,20 +534,31 @@ createApp({
       this.error = '';
       this.nameLookupDone = false;
       this.loadingName = true;
+      let smi = null;
       try {
+        // 先尝试直接访问 PubChem（3s 超时）
         const url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(name)}/property/CanonicalSMILES/JSON`;
-        const resp = await axios.get(url, { timeout: 10000 });
-        const smi = resp.data?.PropertyTable?.Properties?.[0]?.CanonicalSMILES;
-        if (!smi) throw new Error('No SMILES found in PubChem response');
+        const resp = await axios.get(url, { timeout: 3000 });
+        smi = resp.data?.PropertyTable?.Properties?.[0]?.CanonicalSMILES || null;
+      } catch (e) { /* 网络不可达，转后端代理 */ }
+      if (!smi) {
+        try {
+          const base = this.normalizeBase(this.apiBase);
+          if (base) {
+            const r2 = await axios.get(`${base}/lookup?name=${encodeURIComponent(name)}`, { timeout: 12000 });
+            smi = r2.data?.smiles || null;
+          }
+        } catch (e2) { /* 两路均失败 */ }
+      }
+      if (smi) {
         this.smiles = smi;
         this.nameLookupDone = true;
         await nextTick();
         this.draw2D(smi);
-      } catch(e) {
-        this.error = `"${name}" not found in PubChem. Try another spelling or enter SMILES directly.`;
-      } finally {
-        this.loadingName = false;
+      } else {
+        this.error = `"${name}" not found. Try another spelling or enter SMILES directly.`;
       }
+      this.loadingName = false;
     },
     async run() {
       if (!this.smiles.trim()) {
@@ -577,7 +598,8 @@ createApp({
         }, cfg);
 
         this.rows = (p2.data.retrosynthesis.rows || []).slice(0, this.nBeams);
-        this.cards = (p2.data.molecule_cards || []).slice(0, this.nBeams);
+        // 后端已按 n_beams 裁剪并每个 beam-reactant 建一张卡片，直接使用
+        this.cards = p2.data.molecule_cards || [];
 
         await nextTick();
         this.cardViewers.forEach(v => { try { v.clear(); } catch (e) {} });
