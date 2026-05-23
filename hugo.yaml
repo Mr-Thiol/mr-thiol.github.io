@@ -43,6 +43,10 @@ menu:
       name: Posts
       url: /posts/
       weight: 10
+    - identifier: chemformer
+      name: Chemformer
+      url: /chemformer/
+      weight: 15
     - identifier: tags
       name: Tags
       url: /tags/

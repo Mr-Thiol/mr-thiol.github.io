@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chemformer Retrosynthesis Widget</title>
+  <script src="/retro/config.js"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.6.8/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/smiles-drawer@2.0.3/dist/smiles-drawer.min.js"></script>
+  <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+  <style>
+    :root {
+      --bg: #f5f8fa;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #d1d5db;
+      --card: #ffffff;
+      --brand-a: #155e75;
+      --brand-b: #1d4ed8;
+      --ok: #15803d;
+      --warn: #a16207;
+      --bad: #b91c1c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 12% 8%, #dcf3f9, transparent 40%),
+        radial-gradient(circle at 88% 5%, #dbe8ff, transparent 44%),
+        var(--bg);
+      color: var(--ink);
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .wrap { padding: 16px; }
+    .hero {
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--brand-a), var(--brand-b));
+      color: white;
+      padding: 14px 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    .hero h2 { margin: 0; font-size: 20px; }
+    .hero p { margin: 6px 0 0; font-size: 13px; opacity: 0.95; }
+
+    .panel {
+      margin-top: 12px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      background: #fff;
+    }
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(135deg, var(--brand-a), var(--brand-b));
+    }
+    button[disabled] { opacity: 0.55; cursor: not-allowed; }
+
+    .badge {
+      display: inline-block;
+      color: #fff;
+      border-radius: 999px;
+      padding: 4px 10px;
+      margin-right: 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .high { background: var(--ok); }
+    .medium { background: var(--warn); }
+    .low { background: var(--bad); }
+
+    .hint {
+      margin-top: 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      background: #f8fafc;
+      padding: 8px 10px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #334155;
+    }
+
+    .preview-grid {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 980px) {
+      .preview-grid { grid-template-columns: 1fr; }
+    }
+    .box {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px;
+      min-height: 320px;
+      background: #fff;
+    }
+    .box h4 { margin: 0 0 6px; color: #64748b; font-size: 13px; font-weight: 600; }
+    #preview2d { width: 100%; height: 280px; border: 1px dashed #dbe2ea; border-radius: 8px; }
+    #preview3d { width: 100%; height: 280px; border: 1px dashed #dbe2ea; border-radius: 8px; }
+
+    .result-grid {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 1100px) {
+      .result-grid { grid-template-columns: 1fr; }
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { border-bottom: 1px solid #e5e7eb; padding: 7px 6px; text-align: left; vertical-align: top; }
+    th { color: #475569; font-size: 12px; }
+    .mono { font-family: Consolas, "Courier New", monospace; font-size: 12px; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 10px;
+    }
+    .card { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; background: #fff; }
+    .card h5 { margin: 0; padding: 8px 10px; background: #f8fafc; border-bottom: 1px solid #edf2f7; font-size: 13px; }
+    .mol3d { width: 100%; height: 190px; border-bottom: 1px solid #edf2f7; }
+    .meta { padding: 8px 10px; font-size: 12px; color: #334155; line-height: 1.55; }
+
+    .err {
+      margin-top: 10px;
+      border: 1px solid #fecdd3;
+      background: #fff1f2;
+      color: #9f1239;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+<div id="app" class="wrap">
+  <section class="hero">
+    <h2>Chemformer Retrosynthesis</h2>
+    <p>SMILES input -> 2D/3D preview -> success estimate -> one-step retrosynthesis beams.</p>
+  </section>
+
+  <section class="panel">
+    <div class="grid">
+      <div>
+        <label>SMILES</label>
+        <input v-model="smiles" placeholder="Input SMILES" />
+      </div>
+      <div>
+        <label>Beam Size</label>
+        <select v-model.number="nBeams">
+          <option v-for="n in [3,5,8,10,12]" :key="n" :value="n">{{n}}</option>
+        </select>
+      </div>
+      <div>
+        <label>API Base</label>
+        <input v-model="apiBase" placeholder="https://your-space-name.hf.space" />
+      </div>
+      <div>
+        <button @click="run" :disabled="loading">{{ loading ? 'Running...' : 'Preview + Predict' }}</button>
+      </div>
+    </div>
+
+    <div v-if="estimate" style="margin-top:10px;">
+      <span class="badge" :class="estimate.risk_level">{{ estimate.risk_level.toUpperCase() }} | P={{ estimate.probability }}</span>
+      <strong>{{ estimate.message }}</strong>
+      <div class="hint" v-if="estimate.reasons && estimate.reasons.length">
+        <div v-for="(r, idx) in estimate.reasons" :key="idx">- {{ r }}</div>
+      </div>
+    </div>
+
+    <div class="preview-grid">
+      <div class="box">
+        <h4>2D Preview</h4>
+        <canvas id="preview2d"></canvas>
+      </div>
+      <div class="box">
+        <h4>3D Preview</h4>
+        <div id="preview3d"></div>
+      </div>
+    </div>
+
+    <div v-if="error" class="err">{{ error }}</div>
+  </section>
+
+  <section class="panel" v-if="rows.length">
+    <h4 style="margin:0 0 8px;color:#64748b;font-size:13px">Retrosynthesis Outputs</h4>
+    <div class="result-grid">
+      <div>
+        <table>
+          <thead>
+          <tr>
+            <th>Beam</th>
+            <th>Reactants</th>
+            <th>Log-Likelihood</th>
+            <th>Valid</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="r in rows" :key="r.beam">
+            <td>{{ r.beam }}</td>
+            <td class="mono">{{ r.reactants_smiles }}</td>
+            <td>{{ r.log_likelihood }}</td>
+            <td>{{ r.valid_smiles ? 'Yes' : 'No' }}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="cards">
+          <div class="card" v-for="(c, i) in cards" :key="i">
+            <h5>{{ c.name }}</h5>
+            <div class="mol3d" :id="'mol3d-'+i"></div>
+            <div class="meta">
+              <div class="mono">{{ c.smiles }}</div>
+              <div>MW {{ c.descriptors.mw }} | logP {{ c.descriptors.logp }}</div>
+              <div>HBD/HBA {{ c.descriptors.hbd }}/{{ c.descriptors.hba }} | TPSA {{ c.descriptors.tpsa }}</div>
+              <div>Energy {{ c.energy_kcal === null ? 'N/A' : c.energy_kcal + ' kcal/mol' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const { createApp, nextTick } = Vue;
+
+createApp({
+  data() {
+    return {
+      smiles: 'CCN(CC)CCNC(=O)C1=CC(=C(C=C1OC)N)Cl',
+      nBeams: 5,
+      apiBase: (window.RETRO_CONFIG && window.RETRO_CONFIG.apiBase) || 'https://your-space-name.hf.space',
+      loading: false,
+      error: '',
+      estimate: null,
+      rows: [],
+      cards: [],
+      previewViewer: null,
+      cardViewers: []
+    };
+  },
+  methods: {
+    draw2D(smiles) {
+      const drawer = new SmilesDrawer.Drawer({
+        width: document.getElementById('preview2d').clientWidth || 500,
+        height: 280,
+        compactDrawing: false,
+        bondThickness: 1.2
+      });
+      SmilesDrawer.parse(smiles, tree => {
+        drawer.draw(tree, 'preview2d', 'light', false);
+      }, err => {
+        console.error(err);
+      });
+    },
+    draw3D(elId, molblock) {
+      const el = document.getElementById(elId);
+      if (!el) return null;
+      const v = $3Dmol.createViewer(el, { backgroundColor: 'white' });
+      if (molblock) {
+        v.addModel(molblock, 'mol');
+        v.setStyle({}, { stick: { radius: 0.14 }, sphere: { scale: 0.28 } });
+        v.zoomTo();
+        v.render();
+      }
+      return v;
+    },
+    normalizeBase(base) {
+      return String(base || '').replace(/\/$/, '');
+    },
+    async run() {
+      this.loading = true;
+      this.error = '';
+      this.rows = [];
+      this.cards = [];
+      try {
+        const base = this.normalizeBase(this.apiBase);
+        const p1 = await axios.post(base + '/preview', { smiles: this.smiles });
+        this.estimate = p1.data.success_estimate;
+        this.draw2D(p1.data.canonical_smiles || this.smiles);
+
+        if (this.previewViewer) {
+          try { this.previewViewer.clear(); } catch (e) {}
+        }
+        this.previewViewer = this.draw3D('preview3d', p1.data.preview_3d_molblock);
+
+        const p2 = await axios.post(base + '/retrosynthesis', {
+          smiles: this.smiles,
+          n_beams: this.nBeams,
+          optimize_confs: 30
+        });
+
+        this.rows = p2.data.retrosynthesis.rows || [];
+        this.cards = p2.data.molecule_cards || [];
+
+        await nextTick();
+        this.cardViewers.forEach(v => { try { v.clear(); } catch (e) {} });
+        this.cardViewers = [];
+        this.cards.forEach((c, i) => {
+          const v = this.draw3D('mol3d-' + i, c.molblock_3d);
+          if (v) this.cardViewers.push(v);
+        });
+      } catch (e) {
+        this.error = 'Request failed: ' + (e?.response?.data?.detail || e.message || 'Unknown error');
+      } finally {
+        this.loading = false;
+      }
+    }
+  },
+  mounted() {
+    this.draw2D(this.smiles);
+  }
+}).mount('#app');
+</script>
+</body>
+</html>
