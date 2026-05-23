@@ -218,11 +218,12 @@
       background: rgba(0,0,0,0.72); z-index: 9999;
       display: flex; align-items: center; justify-content: center;
     }
-    .modal-box { position: relative; width: 100vw; height: 100vh; background: var(--card); border-radius: 0; overflow: hidden; }
+    .modal-box { position: relative; width: 84vw; height: 74vh; max-width: 1400px; background: var(--card); border-radius: 16px; overflow: hidden; }
     .modal-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
     .modal-close { position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(0,0,0,0.5); border: none; border-radius: 8px; color: white; cursor: pointer; padding: 6px 12px; font-size: 16px; }
     /* 2D canvas inside result cards */
     .c2d-canvas { width: 100%; height: 180px; display: block; border-bottom: 1px solid var(--line); background: var(--input-bg); }
+    .beam-group-header { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); padding:3px 0 6px; border-bottom:1px solid var(--line); margin-bottom:8px; }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
@@ -241,7 +242,7 @@
         <input v-model="compoundName" @keyup.enter="lookupName" placeholder="e.g. aspirin, caffeine, metoclopramide, ibuprofen…" />
       </div>
       <div>
-        <button @click="lookupName" :disabled="!compoundName.trim() || loading">→ SMILES</button>
+        <button @click="lookupName" :disabled="!compoundName.trim() || loading || loadingName">{{ loadingName ? 'Searching…' : '→ SMILES' }}</button>
       </div>
     </div>
     <!-- 示例分子 -->
@@ -255,8 +256,8 @@
     </div>
     <div class="grid">
       <div>
-        <label>SMILES</label>
-        <input v-model="smiles" placeholder="e.g. CCN(CC)CCNC(=O)C1=CC(=C(C=C1OC)N)Cl" />
+        <label>SMILES <span v-if="nameLookupDone" style="color:var(--ok);font-size:11px">✓ from PubChem</span></label>
+        <input v-model="smiles" @input="nameLookupDone=false" placeholder="e.g. CCN(CC)CCNC(=O)C1=CC(=C(C=C1OC)N)Cl" :style="nameLookupDone ? 'border-color:var(--ok)' : ''" />
       </div>
       <div>
         <label>Beam Size</label>
@@ -327,19 +328,23 @@
         </table>
       </div>
       <div>
-        <div class="cards">
-          <div class="card" v-for="(c, i) in cards" :key="i">
-            <h5>{{ c.name }}</h5>
-            <canvas class="c2d-canvas" :id="'c2d-'+i"></canvas>
-            <div class="mol3d-wrap">
-              <div :id="'mol3d-'+i"></div>
-              <button class="viewer-zoom-btn" @click="openZoom(c.molblock_3d)" title="Zoom">⛶</button>
-            </div>
-            <div class="meta">
-              <div class="mono">{{ c.smiles }}</div>
-              <div>MW {{ c.descriptors.mw }} | logP {{ c.descriptors.logp }}</div>
-              <div>HBD/HBA {{ c.descriptors.hbd }}/{{ c.descriptors.hba }} | TPSA {{ c.descriptors.tpsa }}</div>
-              <div>Energy {{ c.energy_kcal === null ? 'N/A' : c.energy_kcal + ' kcal/mol' }}</div>
+        <!-- 按 beam 分组，同一 beam 的反应物横排显示 -->
+        <div v-for="(group, gi) in beamGroups" :key="gi" style="margin-bottom:14px">
+          <div class="beam-group-header">{{ group.label }}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px">
+            <div class="card" v-for="c in group.items" :key="c._idx" style="flex:1;min-width:220px;max-width:340px">
+              <h5>{{ c.reactantLabel }}</h5>
+              <canvas class="c2d-canvas" :id="'c2d-'+c._idx"></canvas>
+              <div class="mol3d-wrap">
+                <div :id="'mol3d-'+c._idx"></div>
+                <button class="viewer-zoom-btn" @click="openZoom(c.molblock_3d)" title="Zoom">⛶</button>
+              </div>
+              <div class="meta">
+                <div class="mono">{{ c.smiles }}</div>
+                <div>MW {{ c.descriptors.mw }} | logP {{ c.descriptors.logp }}</div>
+                <div>HBD/HBA {{ c.descriptors.hbd }}/{{ c.descriptors.hba }} | TPSA {{ c.descriptors.tpsa }}</div>
+                <div>Energy {{ c.energy_kcal === null ? 'N/A' : c.energy_kcal + ' kcal/mol' }}</div>
+              </div>
             </div>
           </div>
         </div>
@@ -354,6 +359,17 @@
       <button class="modal-close" @click="closeModal">✕</button>
     </div>
   </div>
+
+  <!-- References & Acknowledgements -->
+  <section class="panel" style="font-size:12px;color:var(--hint-color)">
+    <h4 style="margin:0 0 8px;font-size:13px;font-weight:700;color:var(--muted)">References &amp; Acknowledgements</h4>
+    <p style="margin:0 0 8px;line-height:1.75">(1) Irwin, R.; Dimitriadis, S.; He, J.; Bjerrum, E. J. Chemformer: A Pre-Trained Transformer for Computational Chemistry. <em>Mach. Learn.: Sci. Technol.</em> <strong>2022</strong>, <em>3</em>&nbsp;(1), 015022. <a href="https://doi.org/10.1088/2632-2153/ac3ffb" target="_blank" rel="noopener noreferrer" style="color:var(--brand-b)">https://doi.org/10.1088/2632-2153/ac3ffb</a></p>
+    <p style="margin:0 0 6px">Open-source repositories:</p>
+    <ul style="margin:0;padding-left:18px;line-height:1.85">
+      <li><a href="https://github.com/MolecularAI/Chemformer" target="_blank" rel="noopener noreferrer" style="color:var(--brand-b)">MolecularAI/Chemformer</a> — Pre-trained BART transformer for retrosynthesis</li>
+      <li><a href="https://github.com/MolecularAI/pysmilesutils" target="_blank" rel="noopener noreferrer" style="color:var(--brand-b)">MolecularAI/pysmilesutils</a> — SMILES tokenization &amp; utilities</li>
+    </ul>
+  </section>
 </div>
 
 <script>
@@ -377,6 +393,8 @@ createApp({
         { name: 'Penicillin G',   smiles: 'CC1(C)SC2C(NC(=O)Cc3ccccc3)C(=O)N2C1C(=O)O' },
         { name: 'Morphine',       smiles: 'OC1=CC2=C(C=C1)C1CC(=C[C@@H]3CC=C[C@H]1[N@@]23)O' },
       ],
+      nameLookupDone: false,
+      loadingName: false,
       loading: false,
       loadingMsg: 'Connecting…',
       loadingSec: 0,
@@ -391,6 +409,20 @@ createApp({
       cardViewers: []
     };
   },
+  computed: {
+    beamGroups() {
+      const map = new Map();
+      this.cards.forEach((c, idx) => {
+        const bm = (c.name || '').match(/Beam\s*(\d+)/i);
+        const rm = (c.name || '').match(/Reactant\s*(\d+)/i);
+        const key = bm ? `Beam ${bm[1]}` : 'Other';
+        const rl  = rm ? `Reactant ${rm[1]}` : (c.name || `#${idx + 1}`);
+        if (!map.has(key)) map.set(key, []);
+        map.get(key).push({ ...c, _idx: idx, reactantLabel: rl });
+      });
+      return Array.from(map.entries()).map(([label, items]) => ({ label, items }));
+    }
+  },
   methods: {
     draw2D(smiles) {
       const canvas = document.getElementById('preview2d');
@@ -401,6 +433,7 @@ createApp({
       const drawer = new SmilesDrawer.Drawer({
         width: w, height: 280,
         compactDrawing: false,
+        terminalCarbons: true,
         bondThickness: 1.2,
         themes: { custom: IS_DARK ? darkTheme : lightTheme }
       });
@@ -432,6 +465,8 @@ createApp({
       this.cards = [];
       this.error = '';
       this.smiles = '';
+      this.compoundName = '';
+      this.nameLookupDone = false;
       nextTick(() => {
         // 清 2D canvas
         const canvas = document.getElementById('preview2d');
@@ -455,7 +490,7 @@ createApp({
       const lightTheme = { C: '#1f2937', O: '#dc2626', N: '#1d4ed8', H: '#6b7280', S: '#d97706', F: '#059669', Cl: '#16a34a', Br: '#c2410c', I: '#7c3aed', P: '#ea580c', background: '#ffffff' };
       const darkTheme  = { C: '#e2e8f0', O: '#f87171', N: '#60a5fa', H: '#94a3b8', S: '#fbbf24', F: '#34d399', Cl: '#4ade80', Br: '#fb923c', I: '#a78bfa', P: '#f97316', background: '#1a1f2e' };
       const drawer = new SmilesDrawer.Drawer({
-        width: w, height: 180, compactDrawing: false, bondThickness: 1.0,
+        width: w, height: 180, compactDrawing: false, terminalCarbons: true, bondThickness: 1.0,
         themes: { custom: IS_DARK ? darkTheme : lightTheme }
       });
       SmilesDrawer.parse(smiles, tree => {
@@ -487,17 +522,28 @@ createApp({
       const name = (this.compoundName || '').trim();
       if (!name) return;
       this.error = '';
+      this.nameLookupDone = false;
+      this.loadingName = true;
       try {
         const url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(name)}/property/CanonicalSMILES/JSON`;
         const resp = await axios.get(url, { timeout: 10000 });
-        const smi = resp.data.PropertyTable.Properties[0].CanonicalSMILES;
+        const smi = resp.data?.PropertyTable?.Properties?.[0]?.CanonicalSMILES;
+        if (!smi) throw new Error('No SMILES found in PubChem response');
         this.smiles = smi;
+        this.nameLookupDone = true;
+        await nextTick();
         this.draw2D(smi);
       } catch(e) {
         this.error = `"${name}" not found in PubChem. Try another spelling or enter SMILES directly.`;
+      } finally {
+        this.loadingName = false;
       }
     },
     async run() {
+      if (!this.smiles.trim()) {
+        this.error = 'SMILES is empty — enter a SMILES string or use the compound name lookup above.';
+        return;
+      }
       this.loading = true;
       this.loadingMsg = 'Connecting…';
       this.loadingSec = 0;
