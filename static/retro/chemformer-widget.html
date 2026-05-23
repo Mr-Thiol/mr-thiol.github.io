@@ -361,16 +361,6 @@
     </div>
   </div>
 
-  <!-- References & Acknowledgements -->
-  <section class="panel" style="font-size:12px;color:var(--hint-color)">
-    <h4 style="margin:0 0 8px;font-size:13px;font-weight:700;color:var(--muted)">References &amp; Acknowledgements</h4>
-    <p style="margin:0 0 8px;line-height:1.75">(1) Irwin, R.; Dimitriadis, S.; He, J.; Bjerrum, E. J. Chemformer: A Pre-Trained Transformer for Computational Chemistry. <em>Mach. Learn.: Sci. Technol.</em> <strong>2022</strong>, <em>3</em>&nbsp;(1), 015022. <a href="https://doi.org/10.1088/2632-2153/ac3ffb" target="_blank" rel="noopener noreferrer" style="color:var(--brand-b)">https://doi.org/10.1088/2632-2153/ac3ffb</a></p>
-    <p style="margin:0 0 6px">Open-source repositories:</p>
-    <ul style="margin:0;padding-left:18px;line-height:1.85">
-      <li><a href="https://github.com/MolecularAI/Chemformer" target="_blank" rel="noopener noreferrer" style="color:var(--brand-b)">MolecularAI/Chemformer</a> — Pre-trained BART transformer for retrosynthesis</li>
-      <li><a href="https://github.com/MolecularAI/pysmilesutils" target="_blank" rel="noopener noreferrer" style="color:var(--brand-b)">MolecularAI/pysmilesutils</a> — SMILES tokenization &amp; utilities</li>
-    </ul>
-  </section>
 </div>
 
 <script>
@@ -454,7 +444,7 @@ createApp({
     draw3D(elId, molblock) {
       const el = document.getElementById(elId);
       if (!el) return null;
-      const bgColor = isDark() ? '#1a1f2e' : 'white';
+      const bgColor = 'white';
       const v = $3Dmol.createViewer(el, { backgroundColor: bgColor });
       if (molblock) {
         v.addModel(molblock, 'mol');
@@ -515,7 +505,7 @@ createApp({
         const el = document.getElementById('modal-3d-viewer');
         if (!el) return;
         if (this.modal3d.viewer) { try { this.modal3d.viewer.clear(); } catch(e) {} }
-        const bgColor = isDark() ? '#1a1f2e' : 'white';
+        const bgColor = 'white';
         const v = $3Dmol.createViewer(el, { backgroundColor: bgColor });
         v.addModel(molblock, 'mol');
         v.setStyle({}, { stick: { radius: 0.18 }, sphere: { scale: 0.32 } });
@@ -545,7 +535,7 @@ createApp({
         try {
           const base = this.normalizeBase(this.apiBase);
           if (base) {
-            const r2 = await axios.get(`${base}/lookup?name=${encodeURIComponent(name)}`, { timeout: 12000 });
+            const r2 = await axios.get(`${base}/lookup?name=${encodeURIComponent(name)}`, { timeout: 60000 });
             smi = r2.data?.smiles || null;
           }
         } catch (e2) { /* 两路均失败 */ }
