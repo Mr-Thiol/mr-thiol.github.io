@@ -43,9 +43,9 @@ menu:
       name: Posts
       url: /posts/
       weight: 10
-    - identifier: chemformer
-      name: Chemformer
-      url: /chemformer/
+    - identifier: retrosyn
+      name: RetroSyn
+      url: /retrosyn/
       weight: 15
     - identifier: tags
       name: Tags

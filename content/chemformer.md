@@ -1,7 +1,7 @@
 ---
 title: "Chemformer Retrosynthesis Demo"
 layout: "page"
-url: "/chemformer/"
+url: "/retrosyn/"
 summary: "Interactive retrosynthesis app powered by Chemformer"
 hidemeta: true
 ---
