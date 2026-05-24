@@ -236,16 +236,6 @@
   </section>
 
   <section class="panel">
-    <!-- 化合物名称查询行 -->
-    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:flex-end">
-      <div style="flex:1">
-        <label>Compound Name (auto → SMILES)</label>
-        <input v-model="compoundName" @keyup.enter="lookupName" placeholder="e.g. aspirin, caffeine, metoclopramide, ibuprofen…" />
-      </div>
-      <div>
-        <button @click="lookupName" :disabled="!compoundName.trim() || loading || loadingName">{{ loadingName ? 'Searching…' : '→ SMILES' }}</button>
-      </div>
-    </div>
     <!-- 示例分子 -->
     <div style="margin-bottom:10px;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:5px;align-items:center">
       <span style="margin-right:2px">Try:</span>
@@ -257,13 +247,13 @@
     </div>
     <div class="grid">
       <div>
-        <label>SMILES <span v-if="nameLookupDone" style="color:var(--ok);font-size:11px">✓ from PubChem</span></label>
-        <input v-model="smiles" @input="nameLookupDone=false" placeholder="e.g. CCN(CC)CCNC(=O)C1=CC(=C(C=C1OC)N)Cl" :style="nameLookupDone ? 'border-color:var(--ok)' : ''" />
+        <label>SMILES</label>
+        <input v-model="smiles" placeholder="e.g. CCN(CC)CCNC(=O)C1=CC(=C(C=C1OC)N)Cl" />
       </div>
       <div>
         <label>Beam Size</label>
         <select v-model.number="nBeams">
-          <option v-for="n in [3,5,8,10,12,15,20]" :key="n" :value="n">{{n}}</option>
+          <option v-for="n in [1,2,3,4,5,6,7,8,9,10]" :key="n" :value="n">{{n}}</option>
         </select>
       </div>
       <div>
@@ -382,20 +372,20 @@ createApp({
   data() {
     return {
       smiles: 'CCN(CC)CCNC(=O)C1=CC(=C(C=C1OC)N)Cl',
-      compoundName: '',
       nBeams: 5,
       apiBase: (window.RETRO_CONFIG && window.RETRO_CONFIG.apiBase) || '',
       examples: [
         { name: 'Metoclopramide', smiles: 'CCN(CC)CCNC(=O)C1=CC(=C(C=C1OC)N)Cl' },
         { name: 'Aspirin',        smiles: 'CC(=O)Oc1ccccc1C(=O)O' },
-        { name: 'Ibuprofen',      smiles: 'CC(C)Cc1ccc(cc1)C(C)C(=O)O' },
-        { name: 'Caffeine',       smiles: 'Cn1c(=O)c2c(ncn2C)n(C)c1=O' },
         { name: 'Paracetamol',    smiles: 'CC(=O)Nc1ccc(O)cc1' },
-        { name: 'Penicillin G',   smiles: 'CC1(C)SC2C(NC(=O)Cc3ccccc3)C(=O)N2C1C(=O)O' },
-        { name: 'Morphine',       smiles: 'OC1=CC2=C(C=C1)C1CC(=C[C@@H]3CC=C[C@H]1[N@@]23)O' },
+        { name: 'Ibuprofen',      smiles: 'CC(C)Cc1ccc(cc1)C(C)C(=O)O' },
+        { name: 'Naproxen',       smiles: 'CC(C(=O)O)c1ccc2cc(OC)ccc2c1' },
+        { name: 'Lidocaine',      smiles: 'CCN(CC)CC(=O)Nc1c(C)cccc1C' },
+        { name: 'Atenolol',       smiles: 'CC(C)NCC(O)COc1ccc(CC(N)=O)cc1' },
+        { name: 'Propranolol',    smiles: 'CC(C)NCC(O)COc1cccc2ccccc12' },
+        { name: 'Benzocaine',     smiles: 'CCOC(=O)c1ccc(N)cc1' },
+        { name: 'Caffeine',       smiles: 'Cn1c(=O)c2c(ncn2C)n(C)c1=O' },
       ],
-      nameLookupDone: false,
-      loadingName: false,
       loading: false,
       loadingMsg: 'Connecting…',
       loadingSec: 0,
@@ -465,8 +455,6 @@ createApp({
       this.cards = [];
       this.error = '';
       this.smiles = '';
-      this.compoundName = '';
-      this.nameLookupDone = false;
       nextTick(() => {
         // 清 2D canvas
         const canvas = document.getElementById('preview2d');
@@ -518,41 +506,9 @@ createApp({
       if (this.modal3d.viewer) { try { this.modal3d.viewer.clear(); } catch(e) {} this.modal3d.viewer = null; }
       this.modal3d.show = false;
     },
-    async lookupName() {
-      const name = (this.compoundName || '').trim();
-      if (!name) return;
-      this.error = '';
-      this.nameLookupDone = false;
-      this.loadingName = true;
-      let smi = null;
-      try {
-        // 先尝试直接访问 PubChem（3s 超时）
-        const url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(name)}/property/CanonicalSMILES/JSON`;
-        const resp = await axios.get(url, { timeout: 3000 });
-        smi = resp.data?.PropertyTable?.Properties?.[0]?.CanonicalSMILES || null;
-      } catch (e) { /* 网络不可达，转后端代理 */ }
-      if (!smi) {
-        try {
-          const base = this.normalizeBase(this.apiBase);
-          if (base) {
-            const r2 = await axios.get(`${base}/lookup?name=${encodeURIComponent(name)}`, { timeout: 60000 });
-            smi = r2.data?.smiles || null;
-          }
-        } catch (e2) { /* 两路均失败 */ }
-      }
-      if (smi) {
-        this.smiles = smi;
-        this.nameLookupDone = true;
-        await nextTick();
-        this.draw2D(smi);
-      } else {
-        this.error = `"${name}" not found. Try another spelling or enter SMILES directly.`;
-      }
-      this.loadingName = false;
-    },
     async run() {
       if (!this.smiles.trim()) {
-        this.error = 'SMILES is empty — enter a SMILES string or use the compound name lookup above.';
+        this.error = 'SMILES is empty — enter a SMILES string or click an example molecule above.';
         return;
       }
       this.loading = true;
