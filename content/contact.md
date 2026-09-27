@@ -20,6 +20,7 @@ I am currently open to **PhD opportunities (Fall 2027)**!
 The best way to reach me is via email:
 * **Academic:** `23307110041@m.fudan.edu.cn` (Recommended)
 * **Personal:** `samshenghsr@gmail.com`
+* **Temporary at WashU, valid through December 2026:** `hsheng@wustl.edu`
 
 <!-- ### 📍 Lab Address
 Department of Chemistry, Fudan University  
@@ -29,6 +30,6 @@ Shanghai, China, 200438 -->
 ---
 
 ### 🌐 Academic Profiles
-<!-- * [**Google Scholar**](https://scholar.google.com) - Full publication list -->
+* [**Google Scholar**](https://scholar.google.com/citations?user=dPaTANYAAAAJ&hl=zh-CN&inst=2230987035966559800) - Full publication list
 * [**GitHub**](https://github.com/Mr-Thiol) - Code & Projects
 * [**LinkedIn**](https://www.linkedin.com/in/hongrui-sheng/) - Professional profile

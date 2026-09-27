@@ -39,6 +39,10 @@ menu:
       name: About
       url: /about/
       weight: 7
+    - identifier: beyond
+      name: Beyond the Lab
+      url: /beyond-the-lab/
+      weight: 8
     - identifier: posts  # 你之前的 Research/Posts
       name: Posts
       url: /posts/
